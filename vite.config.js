@@ -30,10 +30,10 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/.+\.tile\.openstreetmap\.org\/.*/i,
+            urlPattern: /^https:\/\/server\.arcgisonline\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'osm-tiles',
+              cacheName: 'map-tiles',
               expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 7 },
             },
           },

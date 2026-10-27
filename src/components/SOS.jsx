@@ -17,22 +17,29 @@ export default function SOS() {
     window.clearInterval(timer.current)
     timer.current = window.setInterval(() => {
       setHold((h) => {
-        if (h >= 100) {
+        const next = h + 5
+        if (next >= 100) {
           window.clearInterval(timer.current)
-          send()
+          // Defer so React state updates land before unmounting the button
+          window.setTimeout(() => send(), 0)
           return 100
         }
-        return h + 4
+        return next
       })
-    }, 40)
+    }, 35)
   }
 
   function endHold() {
     window.clearInterval(timer.current)
-    if (sosState === 'idle') setHold(0)
+    setHold((h) => {
+      if (h > 0 && h < 100 && sosState === 'idle') return 0
+      return h
+    })
   }
 
   function send() {
+    window.clearInterval(timer.current)
+    setHold(100)
     setSosState('sending')
     window.setTimeout(() => {
       setSosState('sent')
@@ -70,10 +77,19 @@ export default function SOS() {
             type="button"
             className="sos-btn"
             style={{ '--hold': `${hold}%` }}
-            onPointerDown={startHold}
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture?.(e.pointerId)
+              startHold()
+            }}
             onPointerUp={endHold}
-            onPointerLeave={endHold}
             onPointerCancel={endHold}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                send()
+              }
+            }}
+            aria-label={t.sosTap}
           >
             <strong>SOS</strong>
             <small>{t.sosTap}</small>
